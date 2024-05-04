@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from discord import Intents, Client, Message
 from discord.ext import commands
 import message_maker
+import role_util
 
 # Load Token
 load_dotenv()
@@ -15,9 +16,9 @@ intents.message_content = True
 client: Client = Client(intents=intents)
 
 # Channels
-logs = 1235889759646388274
-mod_bot_communication = 1235894297577127977
-bot_bait = 1235887929767759893
+logs = os.getenv('LOGS_CHANNEL')
+mod_bot_communication = os.getenv('MOD_BOT_COMMUNICATION_CHANNEL')
+bot_bait = os.getenv('BOT_BAIT_CHANNEL')
 
 # Startup
 @client.event
@@ -42,25 +43,25 @@ async def on_message(message: Message) -> None:
         #await client.get_channel(mod_bot_communication).send(embed=message_maker.ban_embed(username, user_message, client.get_channel(bot_bait)))
     
     # check for prefix
-    if not user_message.startswith('fulgens!'):
+    if not user_message.startswith('fulgens!') or not role_util.check_for_whitelisted_roles(message.author):
         return
     command = user_message[8:]
     print(f'command received: {command}')
-    command = command.split(" ")
-    arguments = command[1:]
-    command = command[0]
+    command_list = command.split(" ")
+    command = command_list.pop(0)
+    arguments = command_list
     if command == 'help':
-        if not len(arguments) == 0:
-            await message.channel.send('The help command doesn\'t accept any arguments.')
+        if len(arguments) == 0:
+            await message.channel.send('Help command recognized. This is WIP')
+    if command == 'print':
+        if not len(arguments) == 1:
+            await message.channel.send('The print command accepts exactly one arguments.')
             return
-        await message.channel.send('')
-
-
-# Commands
-#if channel == "mod-bot-communication":
-    #    ## These Commands only work when sent to the mod-bot-communication Channel. They for example: update rules
-    #    if message.
-    #elif channel == "rules":
+        if arguments[0] == 'rules':
+            await message.delete()
+            await message.channel.send(embed=message_maker.rules_welcome_embed())
+            #await message.channel.send(embed=message_maker.rules_roles_embed())
+            #await message.channel.send(embed=message_maker.rules_rules_embed())
 
 # Main Entry Point
 def main() -> None:

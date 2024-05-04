@@ -1,0 +1,49 @@
+{
+    "welcome-message": "Welcome to the Panda Den! This is a place where we can all relax and have a good time while talking about Ailurus' videos and more.\n\nBefore proceeding please take a moment to read through the rules and description to get a grasp of everything this server has to offer:",
+    "generic_roles": {
+        "Podcast Pandas": "Abandoned role, originally meant for podcasts.",
+        "4 Horsemen of the Apocalypse": "The mods, here to assist punish and fix",
+        "Angels of the Apocalypse": "Junior Mods, they oversee",
+        "Gods": "Bots? Bots!",
+        "Ailurnaut": "Patreon Contributor, Rank: \"Ailurnaut\"",
+        "Ailurus Fam": "Patreon Contributor, Rank: \"Ailurus Fam\"",
+        "Contributor": "Patreon Contributor",
+        "Ailurus Clan": "Each and single one of you, and we love you for that.",
+        "Notif Squad": "You want those upload Notifications",
+        "Pinmasters": "Your stuff was worth pinning, and everyone gets to see that",
+        "Ancient One": "The core, the elite of the server. People that have been here a long time"
+    },
+    "self_assign_roles": {
+        "Painter": "Your paintings look amazing! This role lets you share it with everyone.",
+        "Musician": "Can you sing? Play the Piano really well? Show everyone with this role.",
+        "Chef": "You're really proud of that sweet risotto you made the other day? Show us.",
+        "Photographer": "Taking beautiful pictures is your forté? Share them."
+    },
+    "channels": {
+        "rules": "What you're reading right now. Duh.",
+        "info-channel": "Who is joining? Read the names here.",
+        "role-select": "Use this to get the roles above",
+        "general": "General Chat, about everything and everyone.",
+        "pol-and-debate": "Debating, but civilized. Mind the off-limit topics.",
+        "botcommands": "Use all the available bots here."        
+    },
+    "rules": [
+        "Refrain from spamming. (Using the same image multiple times in rather high frequency is prohibited as well) You will be muted for a day, if you can't follow this most basic of rules.",
+        "Act Civil, as in don't be edgy or be extreme about your ideals.",
+        "Doxxing will result in a permanent ban.",
+        "(Encouragement of) Raids will result in a ban of the leader and followers (or mute if they didn't do it yet).",
+        "Do not advertise anywhere on this server. This includes but is not limited to: Other Discords, Twitch Streams, Youtube Channels.",
+        "Don't bring conflicts from DMs or other servers to this server. Violation will end up in a 24 hour ban.",
+        "Promotion of illegal habits will result in a ban. This also includes promoting suicide, methods thereof, self harm, etc. -> We take this very seriously, so the punishments will be equally severe.",
+        "Selfies of you and your friends are no longer banned but do be careful with what you share...",
+        "Use the channels as they are intended, frequent misuse will result in a ban.",
+        "#zesty-memes is strictly for lewd or offensive memes, no actual NSFW or straight up racist stuff. Please respect that. In the same manner, please keep #art-gallery SFW as well.",
+        "Be welcoming, don't scare away new people. Seriously.",
+        "Furry content is prohibited. Drawing anthropormorphic animals is still fine just dont sexualize them.",
+        "Banned #pol-and-debate topics are: Karens, Anti-Vax, anything that will end in a non-formal debate.",
+        "Respect Mods, Angels and of course Ailurus himself. Don't try to provoke, irritate or manipulate them.",
+        "If you want to have people on this server warned about, for example, a security issue on discord, let the mods know in private. Spreading false information will result in an immediate ban.",
+        "In the case that anyone posts any classified documents, bomb-making instructions, or any type of material that consist of sensitive government data or otherwise we will not be held responsible."
+    ],
+    "rule-ending": "Please, if you notice anyone breaking these rules and no Mod is here to do anything about it notify us and we will issue punishments as soon as possible."
+}
