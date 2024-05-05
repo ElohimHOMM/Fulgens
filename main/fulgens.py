@@ -1,10 +1,10 @@
 from typing import Final
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message
-from discord.ext import commands
+from discord import Intents, Client, Message, File
 import message_maker
 import role_util
+from json_load_edit import backup_json
 
 # Load Token
 load_dotenv()
@@ -50,18 +50,32 @@ async def on_message(message: Message) -> None:
     command_list = command.split(" ")
     command = command_list.pop(0)
     arguments = command_list
+    await message.delete()
     if command == 'help':
         if len(arguments) == 0:
             await message.channel.send('Help command recognized. This is WIP')
-    if command == 'print':
+    elif command == 'print':
         if not len(arguments) == 1:
-            await message.channel.send('The print command accepts exactly one arguments.')
+            await message.channel.send('The print command accepts exactly one argument.')
             return
         if arguments[0] == 'rules':
-            await message.delete()
+            await message.channel.send(file=File('img/WelcomeBanner.png'))
             await message.channel.send(embed=message_maker.rules_welcome_embed())
-            #await message.channel.send(embed=message_maker.rules_roles_embed())
-            #await message.channel.send(embed=message_maker.rules_rules_embed())
+            await message.channel.send(file=File('img/RolesAndChannelsBanner.png'))
+            await message.channel.send(embed=message_maker.rules_roles_embed())
+            await message.channel.send(file=File('img/RulesBanner.png'))
+            await message.channel.send(embed=message_maker.rules_rules_embed())
+    elif command == 'purge':
+        await message.channel.purge()
+    elif command == 'backup':
+        if not len(arguments) == 1:
+            await message.channel.send('The backup command accepts exactly one argument.')
+            return
+        if backup_json(arguments[0]) == 'ERROR':
+            await message.channel.send(f'ERROR: The file you were trying to backup does not exist.')
+            return
+        await message.channel.send(f'The file \"{arguments[0]}.json\" was succesfully backed up to \"{arguments[0]}_backup.json\".')
+
 
 # Main Entry Point
 def main() -> None:
