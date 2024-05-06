@@ -1,9 +1,11 @@
 from typing import Final
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message, File
+from discord import Intents, Message, File
+from discord.ext.commands import Bot, check
 import message_maker
 import role_util
+import discord
 from json_load_edit import backup_json
 
 # Load Token
@@ -13,73 +15,80 @@ TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 # Bot Setup
 intents: Intents = Intents.default()
 intents.message_content = True
-client: Client = Client(intents=intents)
-
-# Channels
-logs = os.getenv('LOGS_CHANNEL')
-mod_bot_communication = os.getenv('MOD_BOT_COMMUNICATION_CHANNEL')
-bot_bait = os.getenv('BOT_BAIT_CHANNEL')
+bot: Bot = Bot(intents=intents, command_prefix="fulgens!")
 
 # Startup
-@client.event
+@bot.event
 async def on_ready() -> None:
-    print(f'{client.user} is now running.')
+    print(f'{bot.user} is now running.')
+
+# Commands
+@bot.command(desc="Returns a Pong with the Bots latency", help="Returns a Pong with the Bots latency")
+async def ping(ctx):
+    print("Bot has been pinged")
+    await ctx.send(f"Pong! ({round(bot.latency * 1000)}ms)")
+
+#TODO: Check should not raise an Exception OR handle it better. It works, it's just not pretty
+@bot.command()
+@check(role_util.check_for_whitelisted_roles)
+async def rights(ctx):
+    await ctx.send(f"Rights have been checked")
+
+@bot.command()
+@check(role_util.check_for_whitelisted_roles)
+async def print(ctx, to_print):
+    if to_print == 'rules':
+        await ctx.channel.send(file=File('img/WelcomeBanner.png'))
+        await ctx.channel.send(embed=message_maker.rules_welcome_embed())
+        await ctx.channel.send(file=File('img/RolesAndChannelsBanner.png'))
+        await ctx.channel.send(embed=message_maker.rules_roles_embed())
+        await ctx.channel.send(file=File('img/RulesBanner.png'))
+        await ctx.channel.send(embed=message_maker.rules_rules_embed())
+
+@bot.command()
+@check(role_util.check_for_whitelisted_roles)
+async def edit(ctx, file: str, key1: str, key2: str = ""):
+    await ctx.channel.send(f'This command is not implemented yet. WIP')
+
+@bot.command()
+@check(role_util.check_for_whitelisted_roles)
+async def purge(ctx):
+    await ctx.channel.purge()
+
+@bot.command()
+@check(role_util.check_for_whitelisted_roles)
+async def backup(ctx, file):
+    if backup_json(file) == 'ERROR':
+        await ctx.channel.send(f'ERROR: The file you were trying to backup does not exist.')
+        return
+    await ctx.channel.send(f'The file \"{file}.json\" was succesfully backed up to \"{file}_backup.json\".')
+
 
 # Handling Messages
-@client.event
+@bot.event
 async def on_message(message: Message) -> None:
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     
     username: str = str(message.author)
     user_message: str = message.content
     channel: str = str(message.channel)
+    logs = bot.get_channel(int(os.getenv('LOGS_CHANNEL')))
+    bot_bait = bot.get_channel(int(os.getenv('BOT_BAIT_CHANNEL')))
 
     if channel == "bot-bait":
         # Comments are for production / test code swapping
         await message.author.ban(delete_message_days=1, reason=f'Using the Bot Bait Channel - We will assume that, since you used this channel this account was compromised or a bot.\nIf you believe this was an error, contact Elohim.\nMessage in question:\n{user_message}')
         await message.delete()
-        await client.get_channel(logs).send(embed=message_maker.ban_embed(username, user_message, client.get_channel(bot_bait)))
-        #await client.get_channel(mod_bot_communication).send(embed=message_maker.ban_embed(username, user_message, client.get_channel(bot_bait)))
-    
-    # check for prefix
-    if not user_message.startswith('fulgens!') or not role_util.check_for_whitelisted_roles(message.author):
+        await logs.send(embed=message_maker.ban_embed(username, user_message, bot_bait))
+        #await mod_bot_communication.send(embed=message_maker.ban_embed(username, user_message, bot_bait))
         return
-    command = user_message[8:]
-    print(f'command received: {command}')
-    command_list = command.split(" ")
-    command = command_list.pop(0)
-    arguments = command_list
-    await message.delete()
-    if command == 'help':
-        if len(arguments) == 0:
-            await message.channel.send('Help command recognized. This is WIP')
-    elif command == 'print':
-        if not len(arguments) == 1:
-            await message.channel.send('The print command accepts exactly one argument.')
-            return
-        if arguments[0] == 'rules':
-            await message.channel.send(file=File('img/WelcomeBanner.png'))
-            await message.channel.send(embed=message_maker.rules_welcome_embed())
-            await message.channel.send(file=File('img/RolesAndChannelsBanner.png'))
-            await message.channel.send(embed=message_maker.rules_roles_embed())
-            await message.channel.send(file=File('img/RulesBanner.png'))
-            await message.channel.send(embed=message_maker.rules_rules_embed())
-    elif command == 'purge':
-        await message.channel.purge()
-    elif command == 'backup':
-        if not len(arguments) == 1:
-            await message.channel.send('The backup command accepts exactly one argument.')
-            return
-        if backup_json(arguments[0]) == 'ERROR':
-            await message.channel.send(f'ERROR: The file you were trying to backup does not exist.')
-            return
-        await message.channel.send(f'The file \"{arguments[0]}.json\" was succesfully backed up to \"{arguments[0]}_backup.json\".')
-
+    
+    await bot.process_commands(message)
 
 # Main Entry Point
 def main() -> None:
-    client.run(token=TOKEN)
+    bot.run(token=TOKEN)
 
 if __name__ == '__main__':
     main()
