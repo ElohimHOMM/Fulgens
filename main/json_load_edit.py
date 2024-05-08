@@ -3,6 +3,14 @@ import os
 
 path: str = 'main/data/'
 
+def read_string(file_name: str, key1: str, key2: str):
+    with open(path + file_name + '.json') as file:
+        payload: dict = json.load(file)
+    target = payload.get(key1)
+    if key2 != "":
+        target = target.get(key2)
+    return target
+
 def get_payload(file_name) -> str:
     with open(path + file_name + '.json') as file:
         payload: dict = json.load(file)

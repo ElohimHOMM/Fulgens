@@ -29,15 +29,15 @@ def rules_roles_embed() -> Embed:
     embed_var.add_field(name="Roles:", value=get_embed_list(generic_roles))
     embed_var.add_field(name="Self assign Roles:", value=get_embed_list(self_assign_roles))
     embed_var.add_field(name="", value="")
-    channel_string = channels_intro + get_embed_list("#", channels)
+    channel_string = channels_intro + get_embed_list(channels, "#")
     embed_var.add_field(name="Channels:", value=channel_string)
-    embed_var.add_field(name="Media Channels:", value=get_embed_list("#", media_channels))
-    embed_var.add_field(name="Gallery Channels:", value=get_embed_list("#", gallery_channels))
-    embed_var.add_field(name="Network Channels:", value=get_embed_list("#", network_channels))
-    embed_var.add_field(name="Special Channels:", value=get_embed_list("#", special_channels))
+    embed_var.add_field(name="Media Channels:", value=get_embed_list(media_channels, "#"))
+    embed_var.add_field(name="Gallery Channels:", value=get_embed_list(gallery_channels, "#"))
+    embed_var.add_field(name="Network Channels:", value=get_embed_list(network_channels, "#"))
+    embed_var.add_field(name="Special Channels:", value=get_embed_list(special_channels, "#"))
     return embed_var
 
-def get_embed_list(prefix, list) -> str:
+def get_embed_list(list, prefix = "") -> str:
     desc: str = ""
     for line in list:
         desc += f"**{prefix}{line}**: {list.get(line)}\n"
