@@ -5,7 +5,8 @@ import discord
 from discord.ext.commands import Bot, check
 import message_maker
 import role_util
-from json_load_edit import backup_json, read_string
+import json_load_edit as jle
+import fulgens_main_db as db
 
 # Helper Class
 ## Class for streamlined coloured console output
@@ -30,11 +31,26 @@ intents.message_content = True
 bot: Bot = Bot(intents=intents, command_prefix="/")
 
 # Commands
-@bot.slash_command(guild_ids=[356965153616429057])
+@bot.slash_command()
 async def ping(interaction):
     print(f"{C.WARNING}LOG:{C.ENDC} Bot has been pinged")
     await interaction.respond(f"Pong! ({round(bot.latency * 1000)}ms)")
     
+@bot.slash_command()
+@check(role_util.check_for_role_hierarchy)
+async def purge(interaction):
+    print(f"{C.WARNING}LOG:{C.ENDC} Purge Command has been called: {C.OKBLUE}{interaction.channel.name}{C.ENDC}")
+    await interaction.channel.purge()
+    await interaction.respond(f'Channel has been purged.')
+
+@bot.slash_command()
+@check(role_util.check_for_role_hierarchy)
+async def add_ban_channel(interaction):
+    db.add_ban_channel(interaction)
+    await interaction.respond(f'Channel was added to ban channels. Users that write a message in here will be banned automatically.')
+
+### Panda Den Only Commands
+
 #TODO: Check should not raise an Exception OR handle it better. It works, it's just not pretty
 @bot.slash_command(guild_ids=[356965153616429057])
 @check(role_util.check_for_whitelisted_roles)
@@ -63,23 +79,15 @@ async def edit(interaction, file: str, key1: str, key2: str = ""):
         # check if it is a lowest level string
         # accept a new value
     print(f"{C.WARNING}LOG:{C.ENDC} Edit Command has been called: {C.OKBLUE}{file}{C.ENDC}, {C.OKBLUE}{key1}{C.ENDC}, {C.OKBLUE}{key2}{C.ENDC}.")
-    await interaction.respond(f'This command is not implemented yet. WIP\nBut we were able to retrieve this string:\n{read_string(file, key1, key2)}')
+    await interaction.respond(f'This command is not implemented yet. WIP\nBut we were able to retrieve this string:\n{jle.read_string(file, key1, key2)}')
     
 @bot.slash_command(guild_ids=[356965153616429057])
 @check(role_util.check_for_whitelisted_roles)
-async def purge(interaction):
-    print(f"{C.WARNING}LOG:{C.ENDC} Purge Command has been called: {C.OKBLUE}{interaction.channel.name}{C.ENDC}")
-    await interaction.channel.purge()
-    await interaction.respond(f'Channel has been purged.')
-
-@bot.slash_command(guild_ids=[356965153616429057])
-@check(role_util.check_for_whitelisted_roles)
 async def backup(interaction, file):
-    if backup_json(file) == 'ERROR':
+    if jle.backup_json(file) == 'ERROR':
         await interaction.respond(f'ERROR: The file you were trying to backup does not exist.')
         return
     await interaction.respond(f'The file \"{file}.json\" was succesfully backed up to \"{file}_backup.json\".')
-
 
 # Startup
 @bot.event
@@ -92,7 +100,10 @@ async def on_message(message: discord.Message) -> None:
     if message.author == bot.user:
         return
 
-    if str(message.channel) == "bot-bait":
+    print(message.channel.id)
+    print(db.get_ban_channel_by_guild_id(message.guild.id))
+
+    if message.channel.id in db.get_ban_channel_by_guild_id(message.guild.id):
         # Comments are for production / test code swapping
         await message.delete()
         await message.author.ban(delete_message_days=1, reason=f'Using the Bot Bait Channel - We will assume that, since you used this channel this account was compromised or a bot.\nIf you believe this was an error, contact Elohim.\nMessage in question:\n{message.content}')

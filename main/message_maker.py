@@ -1,21 +1,21 @@
-from discord import Embed
-import json
-from json_load_edit import get_payload
+from discord import Embed, Member
+import json_load_edit as jle
 
-def ban_embed(username, message, channel) -> Embed:
-    embed_var: Embed = Embed(title="User banned", description=f"After a message in {channel.mention} the user {username} was banned.\nTheir messages have been deleted.")
-    embed_var.add_field(name="Username", value = username)
+def ban_embed(user: Member, message, channel) -> Embed:
+    embed_var: Embed = Embed(title="User banned", description=f"After a message in {channel.mention} the user {user.name} was banned.\nTheir messages have been deleted.")
+    embed_var.add_field(name="Username", value = user.name)
+    embed_var.add_field(name="User ID", value = user.id)
     embed_var.add_field(name="Message for which they were banned", value = message)
     return embed_var
 
 def rules_welcome_embed() -> Embed:
-    payload = get_payload("rules")
+    payload = jle.get_payload("rules")
     welcome_message = payload.get("welcome-message")
     embed_var = Embed(description=welcome_message)
     return embed_var
 
 def rules_roles_embed() -> Embed:
-    payload = get_payload("rules")
+    payload = jle.get_payload("rules")
     generic_roles = payload.get("generic-roles")
     self_assign_roles = payload.get("self-assign-roles")
     channels_intro = payload.get("channels-intro")
@@ -44,7 +44,7 @@ def get_embed_list(list, prefix = "") -> str:
     return desc
 
 def rules_rules_embed() -> Embed:
-    payload = get_payload("rules")
+    payload = jle.get_payload("rules")
     counter: int = 0
     rules = payload.get("rules")
     rule_ending = payload.get("rule-ending")
